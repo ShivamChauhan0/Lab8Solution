@@ -8,6 +8,13 @@ public class BonusSquare {
 	private int Col;
 	private eBonusType BonusType;
 	private boolean Used;
+	
+	/**
+	 * BonusSquare - Set up the Square as a bonus Square
+	 * @param row
+	 * @param col
+	 * @param bonusType
+	 */
 	public BonusSquare(int row, int col, eBonusType bonusType) {
 		super();
 		Row = row;
