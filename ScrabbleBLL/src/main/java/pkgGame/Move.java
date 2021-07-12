@@ -173,9 +173,7 @@ public class Move {
 
 		}
 
-		// All the words are found, time to score the words
-		// If any of the above is NOTAWORD, return NOTAWORD
-
+		//	Return ScoreMove
 		return scoremove;
 	}
 
