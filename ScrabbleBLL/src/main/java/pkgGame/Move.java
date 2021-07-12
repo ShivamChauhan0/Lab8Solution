@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import eNum.eMoveResult;
+import eNum.eMoveType;
 import pkgCore.Dictionary;
 import pkgCore.Word;
 
@@ -17,8 +18,13 @@ public class Move {
 	private HashSet<Space> tiles = new HashSet<Space>();
 	private Dictionary d = new Dictionary();
 	private ScoreMove scoremove = new ScoreMove();
+
 	public Move(Board B) {
 		this.b = B;
+	}
+
+	protected ArrayList<Space> getTiles() {
+		return new ArrayList<Space>(tiles);
 	}
 
 	public void AddTile(Space s) {
@@ -34,32 +40,38 @@ public class Move {
 		return scoremove;
 	}
 
-	public eMoveResult ValidateMove() {
-
-		
+	public ScoreMove ValidateMove() {
 
 		HashMap<Integer, Integer> hmRow = new HashMap<Integer, Integer>();
 		HashMap<Integer, Integer> hmCol = new HashMap<Integer, Integer>();
 		ArrayList<Space> spaces = new ArrayList<Space>(this.tiles);
-		ArrayList<String> StringWords = new ArrayList<String>();
-		ArrayList<Word> PossibleWords = new ArrayList<Word>();
 		ArrayList<Space> moveSpaces;
 		Space minSpace = null;
 		Space maxSpace = null;
 		Space minBoardSpace = null;
 		Space maxBoardSpace = null;
+		eMoveType moveType;
 
-		eMoveResult moveResult;
 		int iRowCnt = 0;
 		int iColCnt = 0;
 
+		// Check to see if:
+		// The board is null
+		// There are no tiles
+		// If the move is Horizontal or Vertical
+		// If the move is a straight line
+
 		// Is board valid (not null)?
-		if (b == null)
-			return eMoveResult.MissingBoard;
+		if (b == null) {
+			scoremove.AddScoreWord(new ScoreWord(d, spaces, b, eMoveResult.MissingBoard));
+			return scoremove;
+		}
 
 		// What if there are no tiles?
-		if (tiles.size() == 0)
-			return eMoveResult.NoTiles;
+		if (tiles.size() == 0) {
+			scoremove.AddScoreWord(new ScoreWord(d, spaces, b, eMoveResult.NoTiles));
+			return scoremove;
+		}
 
 		// Area all tiles either vertical or horizontal?
 		for (int i = 0; i < spaces.size(); i++) {
@@ -75,128 +87,103 @@ public class Move {
 			hmRow.put(spaces.get(i).getRow(), iRowCnt);
 			hmCol.put(spaces.get(i).getCol(), iColCnt);
 		}
+
 		if (hmRow.size() == 1)
-			moveResult = eMoveResult.RowMove;
+			moveType = eMoveType.HORIZONTAL; // eMoveResult.RowMove;
 		else if (hmCol.size() == 1)
-			moveResult = eMoveResult.ColMove;
+			moveType = eMoveType.VERTICAL; // eMoveResult.ColMove;
 		else {
-			moveResult = eMoveResult.NotALine;
-			return moveResult;
+			scoremove.AddScoreWord(new ScoreWord(d, spaces, b, eMoveResult.NotALine));
+			return scoremove;
 		}
 
 		// Is each tile moving to a spot that doesn't have an existing Letter?
-		if (b.isAnySpaceUsed(spaces))
-			return eMoveResult.SpaceUsed;
+		if (b.isAnySpaceUsed(spaces)) {
+			scoremove.AddScoreWord(new ScoreWord(d, spaces, b, eMoveResult.SpaceUsed));
+			return scoremove;
+		}
 
 		// Is at least one tile touching an existing tile or star?
 		if (!b.isAnySpaceAdjacentOrStar(spaces)) {
-			return eMoveResult.NoAdjacentOrStar;
+			scoremove.AddScoreWord(new ScoreWord(d, spaces, b, eMoveResult.NoAdjacentOrStar));
+			return scoremove;
 		}
 
-		switch (moveResult) {
-		case ColMove:
+		switch (moveType) {
+		case VERTICAL:
 			minSpace = spaces.stream().min(Comparator.comparing(Space::getRow))
 					.orElseThrow(NoSuchElementException::new);
 
 			maxSpace = spaces.stream().max(Comparator.comparing(Space::getRow))
 					.orElseThrow(NoSuchElementException::new);
 
-			minBoardSpace = FindMinMaxSpace(b, minSpace, minSpace.getRow(), minSpace.getCol() - 1, moveResult, 0, -1);
+			minBoardSpace = FindMinMaxSpace(b, minSpace, minSpace.getRow(), minSpace.getCol() - 1, moveType, 0, -1);
 
-			maxBoardSpace = FindMinMaxSpace(b, maxSpace, maxSpace.getRow(), maxSpace.getCol() + 1, moveResult, 0, 1);
+			maxBoardSpace = FindMinMaxSpace(b, maxSpace, maxSpace.getRow(), maxSpace.getCol() + 1, moveType, 0, 1);
 
 			break;
 
-		case RowMove:
+		case HORIZONTAL:
 			minSpace = spaces.stream().min(Comparator.comparing(Space::getCol))
 					.orElseThrow(NoSuchElementException::new);
 			maxSpace = spaces.stream().max(Comparator.comparing(Space::getCol))
 					.orElseThrow(NoSuchElementException::new);
 
-			minBoardSpace = FindMinMaxSpace(b, minSpace, minSpace.getRow(), minSpace.getCol() - 1, moveResult, 0, -1);
+			minBoardSpace = FindMinMaxSpace(b, minSpace, minSpace.getRow(), minSpace.getCol() - 1, moveType, 0, -1);
 
-			maxBoardSpace = FindMinMaxSpace(b, maxSpace, maxSpace.getRow(), maxSpace.getCol() + 1, moveResult, 0, 1);
+			maxBoardSpace = FindMinMaxSpace(b, maxSpace, maxSpace.getRow(), maxSpace.getCol() + 1, moveType, 0, 1);
 
 			break;
 		}
 
-		// See if there's a space in the tiles/board
-		if (spaceInWord(b, moveResult, minSpace, maxSpace)) {
-			return eMoveResult.SpaceInWord;
+		moveSpaces = findWordSpaces(b, minBoardSpace, maxBoardSpace, moveType);
+		scoremove.AddScoreWord(new ScoreWord(d, moveSpaces, b, moveType));
+
+		if (scoremove.findMoveResult() != eMoveResult.GoodMove) {
+			return scoremove;
 		}
 
-		//System.out.println("Good word so far");
+		System.out.println("Good word so far");
 
-		// Find initial word minBoardSpace - maxBoardSpace
-		String strInitialWord = findInitialWord(b, minBoardSpace, maxBoardSpace, moveResult);
-		moveSpaces = findInitialWordSpaces(b, minBoardSpace, maxBoardSpace, moveResult);
-		//ScoreWord SWinitial = new ScoreWord(d, moveSpaces, b, moveResult);
-		//SM.AddScoreWord(SWinitial);
-		
-		scoremove.AddScoreWord(new ScoreWord(d,moveSpaces,b,moveResult));
-		
-		
-		//System.out.println(strInitialWord);
-		StringWords.add(strInitialWord);
-
-		// Find every subsequent word. If RowMove, check every column to see if there
-		// is a word made from minSpace to maxSpace.
+		// Find every subsequent word made.
 
 		for (Space s : this.tiles) {
 
-			switch (moveResult) {
-			case ColMove:
-				minBoardSpace = FindMinMaxSpace(b, s, s.getRow(), s.getCol() +1, (moveResult == eMoveResult.ColMove ? eMoveResult.RowMove : eMoveResult.ColMove), 0, -1);
-				maxBoardSpace = FindMinMaxSpace(b, s, s.getRow(), s.getCol() -1, (moveResult == eMoveResult.ColMove ? eMoveResult.RowMove : eMoveResult.ColMove), 0, -1);
+			switch (moveType) {
+			case VERTICAL:
+				minBoardSpace = FindMinMaxSpace(b, s, s.getRow(), s.getCol() + 1,
+						(moveType == eMoveType.VERTICAL ? eMoveType.HORIZONTAL : eMoveType.VERTICAL), 0, -1);
+				maxBoardSpace = FindMinMaxSpace(b, s, s.getRow(), s.getCol() - 1,
+						(moveType == eMoveType.VERTICAL ? eMoveType.HORIZONTAL : eMoveType.VERTICAL), 0, -1);
 				break;
-			case RowMove:				
-				minBoardSpace = FindMinMaxSpace(b, s, s.getRow()-1, s.getCol() , (moveResult == eMoveResult.ColMove ? eMoveResult.RowMove : eMoveResult.ColMove), 0, -1);
-				maxBoardSpace = FindMinMaxSpace(b, s, s.getRow()+1, s.getCol() , (moveResult == eMoveResult.ColMove ? eMoveResult.RowMove : eMoveResult.ColMove), 0, -1);
+			case HORIZONTAL:
+				minBoardSpace = FindMinMaxSpace(b, s, s.getRow() - 1, s.getCol(),
+						(moveType == eMoveType.VERTICAL ? eMoveType.HORIZONTAL : eMoveType.VERTICAL), 0, -1);
+				maxBoardSpace = FindMinMaxSpace(b, s, s.getRow() + 1, s.getCol(),
+						(moveType == eMoveType.VERTICAL ? eMoveType.HORIZONTAL : eMoveType.VERTICAL), 0, -1);
 			}
-			moveSpaces = findInitialWordSpaces(b, minBoardSpace, maxBoardSpace, (moveResult == eMoveResult.ColMove ? eMoveResult.RowMove : eMoveResult.ColMove));
-			scoremove.AddScoreWord(new ScoreWord(d,moveSpaces,b,moveResult));
 
-			String strWord = findSubsequentWords(b, minBoardSpace, maxBoardSpace, moveResult);
-			if (strWord != null)
-				StringWords.add(findSubsequentWords(b, minBoardSpace, maxBoardSpace, moveResult));
+			moveSpaces = findWordSpaces(b, minBoardSpace, maxBoardSpace,
+					(moveType == eMoveType.VERTICAL ? eMoveType.HORIZONTAL : eMoveType.VERTICAL));
+			ScoreWord sw = new ScoreWord(d, moveSpaces, b,
+					(moveType == eMoveType.VERTICAL ? eMoveType.HORIZONTAL : eMoveType.VERTICAL));
+			if (sw.getMoveResult() != eMoveResult.SingleSpace) {
+				scoremove.AddScoreWord(sw);
+			}
+
 		}
 
 		// All the words are found, time to score the words
-		for (String strWord : StringWords) {
-			//ScoreWord SW = new ScoreWord(d, spaces, b);
-
-			Word w = d.findWord(strWord);
-			if (w == null)
-				return eMoveResult.NotAWord;
-			else
-				PossibleWords.add(w);
-		}
-
 		// If any of the above is NOTAWORD, return NOTAWORD
 
-		// Check each tile. Is every word (horizontal or vertical) a valid word? If it's
-		// valid,
-		// determine the score of the word.
-
-		return eMoveResult.GoodMove;
+		return scoremove;
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	@SuppressWarnings("incomplete-switch")
-	private Space FindMinMaxSpace(Board b, Space MinMaxSpace, int Row, int Col, eMoveResult MoveResult, int Boundary,
+	private Space FindMinMaxSpace(Board b, Space MinMaxSpace, int Row, int Col, eMoveType MoveType, int Boundary,
 			int IncreaseDecrease) {
-		switch (MoveResult) {
-		case RowMove:
+		switch (MoveType) {
+		case HORIZONTAL:
 			if (Row == Boundary)
 				if (b.getPuzzle()[Boundary][Col].getLetter() == null)
 					return MinMaxSpace;
@@ -208,12 +195,12 @@ public class Move {
 					return MinMaxSpace;
 				} else if (b.getPuzzle()[Row][Col].getLetter() != null) {
 					// Board has a space, back up one space
-					return FindMinMaxSpace(b, b.getPuzzle()[Row][Col], Row, Col + IncreaseDecrease, MoveResult,
-							Boundary, IncreaseDecrease);
+					return FindMinMaxSpace(b, b.getPuzzle()[Row][Col], Row, Col + IncreaseDecrease, MoveType, Boundary,
+							IncreaseDecrease);
 				}
 			}
 			break;
-		case ColMove:
+		case VERTICAL:
 			if (Col == Boundary)
 				if (b.getPuzzle()[Row][Boundary].getLetter() == null)
 					return MinMaxSpace;
@@ -225,33 +212,13 @@ public class Move {
 					return MinMaxSpace;
 				} else if (b.getPuzzle()[Row][Col].getLetter() != null) {
 					// Board has a space, back up one space
-					return FindMinMaxSpace(b, b.getPuzzle()[Row][Col], Row + IncreaseDecrease, Col, MoveResult,
-							Boundary, IncreaseDecrease);
+					return FindMinMaxSpace(b, b.getPuzzle()[Row][Col], Row + IncreaseDecrease, Col, MoveType, Boundary,
+							IncreaseDecrease);
 				}
 			}
 			break;
 		}
 		return MinMaxSpace;
-	}
-
-	@SuppressWarnings("incomplete-switch")
-	private boolean spaceInWord(Board b, eMoveResult MoveResult, Space minSpace, Space maxSpace) {
-
-		switch (MoveResult) {
-		case ColMove:
-			for (int Row = minSpace.getRow(); Row < maxSpace.getRow(); Row++) {
-				if (FindSpace(b, Row, minSpace.getCol()).getLetter() == null)
-					return true;
-			}
-			break;
-		case RowMove:
-			for (int Col = minSpace.getCol(); Col < maxSpace.getCol(); Col++) {
-				if (FindSpace(b, minSpace.getRow(), Col).getLetter() == null)
-					return true;
-			}
-			break;
-		}
-		return false;
 	}
 
 	private Space FindSpace(Board b, int Row, int Col) {
@@ -263,35 +230,15 @@ public class Move {
 	}
 
 	@SuppressWarnings("incomplete-switch")
-	private String findInitialWord(Board b, Space minSpace, Space maxSpace, eMoveResult MoveResult) {
-		StringBuilder sb = new StringBuilder();
-		switch (MoveResult) {
-		case ColMove:
-			for (int Row = minSpace.getRow(); Row < maxSpace.getRow() + 1; Row++) {
-				Space s = FindSpace(b, Row, minSpace.getCol());
-				sb.append(s.getLetter().getChLetter());
-			}
-			break;
-		case RowMove:
-			for (int Col = minSpace.getCol(); Col < maxSpace.getCol() + 1; Col++) {
-				Space s = FindSpace(b, minSpace.getRow(), Col);
-				sb.append(s.getLetter().getChLetter());
-			}
-			break;
-		}
-		return sb.toString();
-	}
-
-	@SuppressWarnings("incomplete-switch")
-	private ArrayList<Space> findInitialWordSpaces(Board b, Space minSpace, Space maxSpace, eMoveResult MoveResult) {
+	private ArrayList<Space> findWordSpaces(Board b, Space minSpace, Space maxSpace, eMoveType MoveType) {
 		ArrayList<Space> SpacesFound = new ArrayList<Space>();
-		switch (MoveResult) {
-		case ColMove:
+		switch (MoveType) {
+		case VERTICAL:
 			for (int Row = minSpace.getRow(); Row < maxSpace.getRow() + 1; Row++) {
 				SpacesFound.add(FindSpace(b, Row, minSpace.getCol()));
 			}
 			break;
-		case RowMove:
+		case HORIZONTAL:
 			for (int Col = minSpace.getCol(); Col < maxSpace.getCol() + 1; Col++) {
 				SpacesFound.add(FindSpace(b, minSpace.getRow(), Col));
 			}
@@ -299,31 +246,4 @@ public class Move {
 		}
 		return SpacesFound;
 	}
-
-	private String findSubsequentWords(Board b, Space minSpace, Space maxSpace, eMoveResult MoveResult) {
-//		Space minBoardSpace = null;
-//		Space maxBoardSpace = null;
-		StringBuilder sb = new StringBuilder();
-		switch (MoveResult) {
-		case ColMove:
-			break;
-		case RowMove:
-			if (maxSpace.getRow() - minSpace.getRow() == 0)
-				// There are no words, single space
-				return null;
-			for (int iLetter = minSpace.getRow(); iLetter < maxSpace.getRow() + 1; iLetter++) {
-				Space s = FindSpace(b, iLetter, minSpace.getCol());
-				sb.append(s.getLetter().getChLetter());
-			}
-			return sb.toString();
-		}
-
-		return null;
-	}
-
-	private void MakeMove() {
-		if (this.ValidateMove() == eMoveResult.GoodMove) {
-		}
-	}
-
 }

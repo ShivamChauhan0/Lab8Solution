@@ -29,16 +29,10 @@ public class Board {
 	{
 		this.getPuzzle()[s.getRow()][s.getCol()] = s;
 	}
-	
-	
-	public ArrayList<String> GetMoveWords(ArrayList<Space> tiles)
-	{
-		return null;
+	protected ArrayList<Move> getMovesMade() {
+		return movesMade;
 	}
-	
-	
-	
-	
+
 	public boolean isAnySpaceUsed(ArrayList<Space> spaces)
 	{
 		for (Space s: spaces)
@@ -145,7 +139,21 @@ public class Board {
 	}
 	
 	
-	private void MakeMove(Move m) {
+	protected void MakeMove(Move m) {
+		m.ValidateMove();
+		
+		for (Space s: m.getTiles())
+		{
+			//	If the space is a bonus space, turn it off
+			if (this.puzzle[s.getRow()][s.getCol()].getBonusSquare() != null)
+			{
+				this.puzzle[s.getRow()][s.getCol()].getBonusSquare().setUsed(true);
+			}
+			
+			//	Record the space
+			this.SetSpace(s);
+		}
+		//	Add the move to the history
 		movesMade.add(m);
 	}
 

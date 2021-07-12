@@ -8,20 +8,11 @@ import eNum.eMoveResult;
 public class ScoreMove {
 
 	private UUID ScoreMoveID;
-	private eMoveResult MoveResult;
 	private ArrayList<ScoreWord> arrScoreWord = new ArrayList<ScoreWord>();
 
 	public ScoreMove() {
 		super();
 		ScoreMoveID = UUID.randomUUID();
-	}
-
-	public eMoveResult getMoveResult() {
-		return MoveResult;
-	}
-
-	public void setMoveResult(eMoveResult moveResult) {
-		MoveResult = moveResult;
 	}
 
 	public UUID getScoreMoveID() {
@@ -36,8 +27,21 @@ public class ScoreMove {
 		return arrScoreWord;
 	}
 
-	public int getScoreMove() {
-		return arrScoreWord.stream().map(x -> x.getScore()).reduce(0, Integer::sum);
+	public int CalculateScoreMove() {
+		//TODO: Calculate Score Move
+		return 0;
+	}
+	
+	public eMoveResult findMoveResult()
+	{
+		for (ScoreWord SM: arrScoreWord)
+		{
+			if (SM.getMoveResult() != eMoveResult.GoodMove)
+			{
+				return SM.getMoveResult();
+			}
+		}
+		return eMoveResult.GoodMove;
 	}
 
 }
