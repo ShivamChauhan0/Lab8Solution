@@ -117,8 +117,45 @@ public class ScoreWord {
 	 * 
 	 */
 	private int CalculateWordScore() {
-		//TODO: Calculate the Word's score
 		int iTotalScore = 0;
+
+		for (Space s : this.tiles) {
+			Space BoardSpace = this.board.getPuzzle()[s.getRow()][s.getCol()];
+			if ((BoardSpace.getBonusSquare() != null) && (BoardSpace.getBonusSquare().isUsed() == false)
+					&& ((BoardSpace.getBonusSquare().getBonusType() == eBonusType.DoubleLetter)
+							|| (BoardSpace.getBonusSquare().getBonusType() == eBonusType.TripleLetter))) {
+				BonusSquare BS = BoardSpace.getBonusSquare();
+				switch (BS.getBonusType()) {
+				case DoubleLetter:
+				case Star:
+					iTotalScore += (s.getLetter().getiScore() * 2);
+					break;
+				case TripleLetter:
+					iTotalScore += (s.getLetter().getiScore() * 3);
+					break;
+				}
+			} else {
+				iTotalScore += s.getLetter().getiScore();
+			}
+		}
+
+		for (Space s : this.tiles) {
+			Space BoardSpace = this.board.getPuzzle()[s.getRow()][s.getCol()];
+			if ((BoardSpace.getBonusSquare() != null) && (BoardSpace.getBonusSquare().isUsed() == false)
+					&& ((BoardSpace.getBonusSquare().getBonusType() == eBonusType.DoubleWord)
+							|| (BoardSpace.getBonusSquare().getBonusType() == eBonusType.TripleWord))) {
+				BonusSquare BS = BoardSpace.getBonusSquare();
+				switch (BS.getBonusType()) {
+				case DoubleWord:
+				case Star:
+					iTotalScore += (s.getLetter().getiScore() * 2);
+					break;
+				case TripleWord:
+					iTotalScore += (s.getLetter().getiScore() * 3);
+					break;
+				}
+			}
+		}
 
 		return iTotalScore;
 	}
