@@ -15,12 +15,18 @@ import pkgCore.Word;
 public class Move {
 
 	private Board b;
+	private Player player;
 	private HashSet<Space> tiles = new HashSet<Space>();
 	private Dictionary d = new Dictionary();
 	private ScoreMove scoremove = new ScoreMove();
 
-	public Move(Board B) {
+	public Move(Board B)
+	{
 		this.b = B;
+	}
+	public Move(Board B, Player P) {
+		this.b = B;
+		this.player = P;
 	}
 
 	protected ArrayList<Space> getTiles() {
@@ -40,6 +46,9 @@ public class Move {
 		return scoremove;
 	}
 
+	public Player getPlayer() {
+		return player;
+	}
 	public ScoreMove ValidateMove() {
 
 		HashMap<Integer, Integer> hmRow = new HashMap<Integer, Integer>();

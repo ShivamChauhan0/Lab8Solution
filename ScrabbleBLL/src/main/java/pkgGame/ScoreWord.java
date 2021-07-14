@@ -157,6 +157,10 @@ public class ScoreWord {
 			}
 		}
 
+		//	Did the move earn the bonus? 
+		if (this.tiles.size() == 7)
+			iTotalScore += 50;
+		
 		return iTotalScore;
 	}
 

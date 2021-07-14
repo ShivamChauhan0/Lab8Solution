@@ -5,12 +5,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import eNum.eMoveResult;
+import pkgHelper.Util;
 
 public class MoveLab7Test {
 
 	@Test
 	public void TestMovesNotAdjacent1() {
-		
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		Board b = new Board();
 		Space s1 = new Space(new Letter('A'),0,0);
 		Space s2 = new Space(new Letter('X'),0,1);
@@ -20,12 +21,13 @@ public class MoveLab7Test {
 		ScoreMove sMove = m.ValidateMove();
 		assertEquals(eMoveResult.NoAdjacentOrStar, sMove.findMoveResult());
 		
-		
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 
 	@Test
 	public void TestMovesNotInLine1() {
 		
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		Board b = new Board();
 		Space s1 = new Space(new Letter('A'),7,7);
 		Space s2 = new Space(new Letter('X'),4,3);
@@ -35,22 +37,25 @@ public class MoveLab7Test {
 		ScoreMove sMove = m.ValidateMove();
 		assertEquals(eMoveResult.NotALine, sMove.findMoveResult());		
 
-		
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 	
 	@Test
 	public void TestMoveNoTiles1() {
 		
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		Board b = new Board();
 		Move m = new Move(b);
 		ScoreMove sMove = m.ValidateMove();
 		assertEquals(eMoveResult.NoTiles, sMove.findMoveResult());				
 		
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}	
 	
 	@Test
 	public void TestSpaceInWord() {
 		
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		Board b = new Board();
 		b.SetSpace(new Space(new Letter('T'), 7, 6));
 		b.SetSpace(new Space(new Letter('H'), 7, 7));
@@ -62,12 +67,13 @@ public class MoveLab7Test {
 		
 		ScoreMove sMove = m.ValidateMove();
 		assertEquals(eMoveResult.SpaceInWord, sMove.findMoveResult());	
-
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 
 	@Test
 	public void TestLegalMove1() {
 		
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		//	Empty board, add the first word
 		Board b = new Board();
 		Space s1 = new Space(new Letter('A'),7,7);
@@ -80,12 +86,13 @@ public class MoveLab7Test {
 		ScoreMove sMove = m.ValidateMove();
 		assertEquals(eMoveResult.GoodMove, sMove.findMoveResult());	
 		
-		
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 	
 	@Test
 	public void TestLegalMove2() {
 
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		// Board has tiles,
 		Board b = new Board();
 		b.SetSpace(new Space(new Letter('T'), 7, 6));
@@ -99,6 +106,8 @@ public class MoveLab7Test {
 
 		ScoreMove sMove = m.ValidateMove();
 		assertEquals(eMoveResult.GoodMove, sMove.findMoveResult());
+		
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 
 
@@ -106,6 +115,7 @@ public class MoveLab7Test {
 	@Test
 	public void TestBadWord1() {
 
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		// Board has tiles,
 		Board b = new Board();
 		b.SetSpace(new Space(new Letter('R'), 7, 7));
@@ -120,11 +130,14 @@ public class MoveLab7Test {
 
 		ScoreMove sMove = m.ValidateMove();
 		assertEquals(eMoveResult.NotAWord, sMove.findMoveResult());
+		
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 
 	@Test
 	public void TestLegalMove3() {
 
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		// Board has tiles,
 		Board b = new Board();
 		b.SetSpace(new Space(new Letter('R'), 7, 7));
@@ -151,12 +164,15 @@ public class MoveLab7Test {
 			}
 			System.out.println(" score: " + sw.getScore());
 		}
+ 		
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 	
 	
 	@Test
 	public void TestLegalMove4() {
 
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		// Board has tiles,
 		Board b = new Board();
 		b.SetSpace(new Space(new Letter('R'), 7, 7));
@@ -187,11 +203,13 @@ public class MoveLab7Test {
 			}
 			System.out.println(" score: " + sw.getScore());
 		}
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 	
 	@Test
 	public void TestLegalMakeMove1() {
 
+		Util.PrintStart(new Throwable().getStackTrace()[0].getMethodName());
 		// Board has tiles,
 		Board b = new Board();
 		b.SetSpace(new Space(new Letter('R'), 7, 7));
@@ -218,22 +236,8 @@ public class MoveLab7Test {
 		{
 			System.out.println(m.getScoremove().CalculateScoreMove());
 		}
-		/*
-		ScoreMove sMove = m.ValidateMove();
-		assertEquals(eMoveResult.GoodMove, sMove.findMoveResult());
-		ScoreMove sm = m.getScoremove();
 		
-		int iScoreMove = sm.CalculateScoreMove();
-		
-		assertEquals(16,iScoreMove);
-		
- 		for (ScoreWord sw : sm.getArrScoreWord()) {
-			for (Space s : sw.getTiles()) {
-				System.out.print(s.getLetter().getChLetter());
-			}
-			System.out.println(" score: " + sw.getScore());
-		}
-		*/
+		Util.PrintEnd(new Throwable().getStackTrace()[0].getMethodName());	
 	}
 
 }

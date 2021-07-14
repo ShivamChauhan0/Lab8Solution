@@ -1,15 +1,27 @@
 package pkgGame;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import eNum.eBonusType;
+import eNum.eMoveResult;
+import eNumExceptions.eDrawExceptionType;
+import pkgExceptions.DrawException;
 
 public class Board {
 
 	private Space[][] puzzle;
 	private ArrayList<BonusSquare> bonuses = new ArrayList<BonusSquare>();
 	private ArrayList<Move> movesMade = new ArrayList<Move>();
+	private ArrayList<Letter> tileBag = new ArrayList<Letter>();
 
+	/**
+	 * Board - Set the bonus squares. Create the TileBag, Shuffle the Tilebag
+	 * 
+	 * @author BRG
+	 * @version Lab #1
+	 * @since Lab #1
+	 */
 	public Board() {
 		SetBonus();
 		puzzle = new Space[15][15];
@@ -19,51 +31,124 @@ public class Board {
 				puzzle[Row][Col] = s;
 			}
 		}
+
+		CreateTileBag();
+		Collections.shuffle(tileBag);
 	}
 
 	public Space[][] getPuzzle() {
 		return puzzle;
 	}
 
-	public void SetSpace(Space s)
-	{
+	public void SetSpace(Space s) {
 		this.getPuzzle()[s.getRow()][s.getCol()] = s;
 	}
+
 	protected ArrayList<Move> getMovesMade() {
 		return movesMade;
 	}
 
-	public boolean isAnySpaceUsed(ArrayList<Space> spaces)
-	{
-		for (Space s: spaces)
-		{
+	protected ArrayList<Letter> drawLetter(int cnt) throws DrawException {
+		ArrayList<Letter> drawLetters = new ArrayList<Letter>();
+		for (int i = 0; i < cnt; i++) {
+			drawLetters.add(drawLetter());
+		}
+		return drawLetters;
+	}
+
+	/**
+	 * drawLetter - Draw a letter from the tileBag and return it. If the tileBag is
+	 * empty, throw a DrawException
+	 * 
+	 * @author BRG
+	 * @version Lab #8
+	 * @since Lab #8
+	 * @return
+	 * @throws DrawException
+	 */
+	protected Letter drawLetter() throws DrawException {
+		// TODO: Complete this method
+
+		// FIXME: I don't want to return null!
+		return null;
+	}
+
+	/**
+	 * getTileBag - return the current state of the board's tilebag
+	 * 
+	 * @author BRG
+	 * @version Lab #8
+	 * @since Lab #8
+	 * @return - ArrayList<Letter> of remaining tiles
+	 */
+	private ArrayList<Letter> getTileBag() {
+		// TODO: Complete this method
+		// FIXME: I don't want to return null
+		return null;
+	}
+
+	/**
+	 * RemoveLettersFromTileBag - Remove letter(s) from the tileBag
+	 * 
+	 * @author BRG
+	 * @version Lab #4
+	 * @since Lab #4
+	 * @param removeLetters
+	 */
+	private void RemoveLettersFromTileBag(ArrayList<Letter> removeLetters) {
+		// TODO: Complete this method
+	}
+
+	/**
+	 * CreateTileBag - Create the tile bag in the initial Board creation
+	 * 
+	 * @author BRG
+	 * @version Lab #8
+	 * @since Lab #8
+	 */
+	private void CreateTileBag() {
+		// TODO: Complete this method
+	}
+
+	/**
+	 * AddLetterToTileBag - Add a single letter to the tilebag.
+	 * 
+	 * @author BRG
+	 * @version Lab #8
+	 * @since Lab #8
+	 */
+	private void AddLetterToTileBag(Character c, int num) {
+		// TODO: Complete this method
+	}
+
+	public boolean isAnySpaceUsed(ArrayList<Space> spaces) {
+		for (Space s : spaces) {
 			if (this.getPuzzle()[s.getRow()][s.getCol()].getLetter() != null)
 				return true;
 		}
 		return false;
 	}
+
 	public boolean isAnySpaceAdjacentOrStar(ArrayList<Space> spaces) {
 
 		ArrayList<Space> spacesAdjacent = new ArrayList<Space>();
 
-		//	Check for Star
-		for (Space s: spaces)
-		{
-			if (this.getPuzzle()[s.getRow()][s.getCol()].getBonusSquare() != null 
+		// Check for Star
+		for (Space s : spaces) {
+			if (this.getPuzzle()[s.getRow()][s.getCol()].getBonusSquare() != null
 					&& this.getPuzzle()[s.getRow()][s.getCol()].getBonusSquare().getBonusType() == eBonusType.Star)
 				return true;
 		}
-		
+
 		for (Space s : spaces) {
 			spacesAdjacent.addAll(findAdacentSpaces(s));
 		}
 
-		for (Space s: spacesAdjacent)
-		{
+		for (Space s : spacesAdjacent) {
 			if (s.getLetter() != null)
-				return true;			
+				return true;
 		}
-		
+
 		return false;
 	}
 
@@ -102,7 +187,6 @@ public class Board {
 		return spaces;
 	}
 
-	
 	public ArrayList<Space> findAdacentSpaces(Space s) {
 		ArrayList<Space> spaces = new ArrayList<Space>();
 		if (this.puzzle == null)
@@ -137,23 +221,22 @@ public class Board {
 		}
 		return spaces;
 	}
-	
-	
+
 	protected void MakeMove(Move m) {
-		m.ValidateMove();
-		
-		for (Space s: m.getTiles())
-		{
-			//	If the space is a bonus space, turn it off
-			if (this.puzzle[s.getRow()][s.getCol()].getBonusSquare() != null)
-			{
+		if (m.ValidateMove().findMoveResult() != eMoveResult.GoodMove) {
+
+		}
+
+		for (Space s : m.getTiles()) {
+			// If the space is a bonus space, turn it off
+			if (this.puzzle[s.getRow()][s.getCol()].getBonusSquare() != null) {
 				this.puzzle[s.getRow()][s.getCol()].getBonusSquare().setUsed(true);
 			}
-			
-			//	Record the space
+
+			// Record the space
 			this.SetSpace(s);
 		}
-		//	Add the move to the history
+		// Add the move to the history
 		movesMade.add(m);
 	}
 
