@@ -28,7 +28,11 @@ public class ScoreMove {
 	}
 
 	public int CalculateScoreMove() {
-		return arrScoreWord.stream().map(x -> x.getScore()).reduce(0, Integer::sum);
+		int totalscore = 0;
+		for(ScoreWord w: arrScoreWord) {
+			totalscore += w.getScore();
+		}
+		return totalscore;
 	}
 	
 	public eMoveResult findMoveResult()
