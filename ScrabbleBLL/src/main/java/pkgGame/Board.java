@@ -67,12 +67,18 @@ public class Board {
 	 * @throws DrawException
 	 */
 	protected Letter drawLetter() throws DrawException {
-		// TODO: Complete this method
-
-		// FIXME: I don't want to return null!
-		return null;
-	}
-
+		if (tileBag.isEmpty())
+			throw new DrawException("The tile bag is empty");
+		
+		//get random letter from tilebag
+		int randomIndex = (int)(Math.random() * tileBag.size());
+		Letter randomLetter = getTileBag().get(randomIndex);
+		
+		//remove letter from tilebag
+		tileBag.remove(randomIndex);
+		
+		return randomLetter();
+	} 
 	/**
 	 * getTileBag - return the current state of the board's tilebag
 	 * 
@@ -82,9 +88,7 @@ public class Board {
 	 * @return - ArrayList<Letter> of remaining tiles
 	 */
 	private ArrayList<Letter> getTileBag() {
-		// TODO: Complete this method
-		// FIXME: I don't want to return null
-		return null;
+		return this.tileBag;
 	}
 
 	/**

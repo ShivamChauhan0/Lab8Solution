@@ -25,23 +25,6 @@ public class Game {
 		cllPlayers = new CircularLinkedList<Player>();
 	}
 
-	protected Letter drawLetter() throws DrawException {
-		if (tileBag.isEmpty())
-			throw new DrawException("The tile bag is empty");
-		
-		//get random letter from tilebag
-		int randomIndex = (int)(Math.random() * tileBag.size());
-		Letter randomLetter = getTileBag().get(randomIndex);
-		
-		//remove letter from tilebag
-		tileBag.remove(randomIndex);
-		
-		return randomLetter();
-
-	private ArrayList<Letter> getTileBag() {
-		return this.tileBag;
-	}
- 
 	/**
 	 * StartGame - Start the game. If there are no players in cllPlayers, throw
 	 * exception Make sure to draw seven tiles and add them to the player's
