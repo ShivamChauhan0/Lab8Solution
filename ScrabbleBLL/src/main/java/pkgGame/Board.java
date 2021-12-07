@@ -100,9 +100,9 @@ public class Board {
 	 * @param removeLetters
 	 */
 	private void RemoveLettersFromTileBag(ArrayList<Letter> removeLetters) {
-		// TODO: Complete this method
-	}
-
+		this.tileBag.remove(removeLetters);
+		removeLetters.clear();
+		}
 	/**
 	 * CreateTileBag - Create the tile bag in the initial Board creation
 	 * 
@@ -121,9 +121,13 @@ public class Board {
 	 * @version Lab #8
 	 * @since Lab #8
 	 */
-	private void AddLetterToTileBag(Character c, int num) {
-		// TODO: Complete this method
-	}
+	 private void AddLetterToTileBag(Character c, int num) {
+		 Letter d = new Letter(c);
+		 for (int i =0; i < num; i++) {
+		 this.tileBag.add(d);
+		 }
+		 }
+
 
 	public boolean isAnySpaceUsed(ArrayList<Space> spaces) {
 		for (Space s : spaces) {
