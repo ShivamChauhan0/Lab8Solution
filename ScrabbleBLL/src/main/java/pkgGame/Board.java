@@ -111,7 +111,33 @@ public class Board {
 	 * @since Lab #8
 	 */
 	private void CreateTileBag() {
-		// TODO: Complete this method
+		AddLetterToTileBag('a',9);
+		AddLetterToTileBag('b',2);
+		AddLetterToTileBag('c',2);
+		AddLetterToTileBag('d',4);
+		AddLetterToTileBag('e',12);
+		AddLetterToTileBag('f',2);
+		AddLetterToTileBag('g',3);
+		AddLetterToTileBag('h',2);
+		AddLetterToTileBag('i',9);
+		AddLetterToTileBag('j',1);
+		AddLetterToTileBag('k',1);
+		AddLetterToTileBag('l',4);
+		AddLetterToTileBag('m',2);
+		AddLetterToTileBag('n',6);
+		AddLetterToTileBag('o',8);
+		AddLetterToTileBag('p',2);
+		AddLetterToTileBag('q',1);
+		AddLetterToTileBag('r',6);
+		AddLetterToTileBag('s',4);
+		AddLetterToTileBag('t',6);
+		AddLetterToTileBag('u',4);
+		AddLetterToTileBag('v',2);
+		AddLetterToTileBag('w',2);
+		AddLetterToTileBag('x',1);
+		AddLetterToTileBag('y',2);
+		AddLetterToTileBag('z',1);
+		AddLetterToTileBag(' ',2);
 	}
 
 	/**
