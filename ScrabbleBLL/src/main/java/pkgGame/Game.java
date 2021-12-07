@@ -38,8 +38,19 @@ public class Game {
 	 */
 
 	public void StartGame() throws DrawException, GameException {
-		// TODO: Complete this method
-	}
+
+		if (cllPlayers.size() == 0) {
+		throw new GameException(this, eGameExceptionType.NoPlayers);
+		}
+
+		for (int i = 0; i < cllPlayers.size(); i++) {
+
+		playerTileRack.put(cllPlayers.get(i).getPlayerID(), this.getGameBoard().drawLetter(7));
+		}
+
+
+		}
+
 
 	public Player MakeMove(Move m) throws MoveException {
 		// Can the player move? Are they the current player?
@@ -78,12 +89,8 @@ public class Game {
 	 */
 
 	private ArrayList<Letter> getPlayersTiles(Player p) {
-		// TODO: Complete this method
-
-		// FIXME: I don't want to return a null!
-		return null;
-
-	}
+		return playerTileRack.get(p.getPlayerID());
+		}
 
 	/**
 	 * removePlayerTile - Remove a tile from the player's TileRack
@@ -96,8 +103,8 @@ public class Game {
 	 */
 
 	private void removePlayerTile(Player p, Letter l) {
-		// TODO: Complete this method
-	}
+		playerTileRack.remove(p.getPlayerID(), l);
+		}
 
 	/**
 	 * addPlayerTile - Add a tile to a player's TileRack
@@ -108,9 +115,9 @@ public class Game {
 	 * @param p
 	 * @param l
 	 */
-	private void addPlayerTile(Player p, Letter l) {
-		// TODO: Complete this method
-	}
+	private void addPlayerTile(Player p, Letter l ) {
+		playerTileRack.get(p.getPlayerID()).add(l);
+		}
 
 	public UUID getGameID() {
 		return GameID;
